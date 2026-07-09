@@ -257,7 +257,7 @@ The DFA is shown below.
 
 ## Figure 5.1 : DFA for Recognizing "ab"
 
-![Figure 5.1 - DFA for ab](images\lec05_fig01_dfa_ab.png.png)
+![Figure 5.1 - DFA for ab](images/lec05_fig01_dfa_ab.png)
 
 ---
 
@@ -452,7 +452,7 @@ The DFA should perform the following checks:
 
 ## Figure 5.2 : DFA for Identifier
 
-![Figure 5.2 - Identifier DFA](images\lec05_fig02_identifier_dfa.png.png)
+![Figure 5.2 - Identifier DFA](images/lec05_fig02_identifier_dfa.png)
 
 ---
 
@@ -625,7 +625,7 @@ Therefore, the string is permanently rejected.
 
 ## Figure 5.3 : Trap State
 
-![Figure 5.3 - Trap State](images\lec05_fig03_trap_state.png)
+![Figure 5.3 - Trap State](images/lec05_fig03_trap_state.png)
 
 ---
 
