@@ -912,4 +912,3 @@ We will study:
 - Examples of CFG
 - Why CFG is used in Compiler Design
 
-This is the foundation for understanding all parsing techniques in the remaining lectures of Module 2.
