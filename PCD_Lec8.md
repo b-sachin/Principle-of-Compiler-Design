@@ -728,36 +728,6 @@ Let us now see where LEX fits in the compiler.
 
 ---
 
-### Graphviz (Dreampuf) Code
-
-```dot
-digraph CompilerPipeline {
-
-    rankdir=LR;
-    bgcolor="white";
-
-    node [shape=box, style=rounded];
-
-    RE[label="Regular\nExpressions"];
-    LEX[label="LEX"];
-    Scanner[label="Lexical\nAnalyzer"];
-    Parser[label="Syntax\nAnalyzer"];
-
-    RE -> LEX;
-    LEX -> Scanner;
-    Scanner -> Parser;
-
-}
-```
-
-Save the image as
-
-```text
-images/lec08_fig05_lex_pipeline.png
-```
-
----
-
 # Inside the Compiler 🔍
 
 The complete process from source code to tokens is now clear.
