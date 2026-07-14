@@ -1,0 +1,529 @@
+# Principles of Compiler Design
+# Lecture 16 - LL(1) Parsing Algorithm and Worked Example (Part 1)
+
+**Course:** B.Tech Information Technology (Semester VII)
+**Module:** 2 - Syntax Analysis
+**Duration:** 60 Minutes
+
+---
+
+# Learning Objectives
+
+After completing this lecture, students should be able to:
+
+- Apply the LL(1) parsing algorithm.
+- Use the parsing table correctly.
+- Trace stack operations.
+- Parse an input string step by step.
+- Decide whether an input string is accepted or rejected.
+
+---
+
+# Revision
+
+In the previous lecture, we learned
+
+- FIRST Sets
+- FOLLOW Sets
+- LL(1) Parsing Table
+- Predictive Parsing Algorithm
+
+Today,
+
+we will become the parser ourselves.
+
+---
+
+# Running Grammar
+
+```text
+E  → T E'
+
+E' → + T E' | ε
+
+T  → F T'
+
+T' → * F T' | ε
+
+F  → id | (E)
+```
+
+---
+
+# LL(1) Parsing Table
+
+| Non-Terminal | id | + | * | ( | ) | $ |
+|--------------|----|----|----|----|----|----|
+| E | E→TE' | | | E→TE' | | |
+| E' | | E'→+TE' | | | E'→ε | E'→ε |
+| T | T→FT' | | | T→FT' | | |
+| T' | | T'→ε | T'→*FT' | | T'→ε | T'→ε |
+| F | F→id | | | F→(E) | | |
+
+---
+
+# Input String
+
+We will parse
+
+```text
+id + id * id $
+```
+
+---
+
+# Initial Configuration
+
+Stack
+
+```text
+$
+
+E
+```
+
+Input
+
+```text
+id + id * id $
+```
+
+Remember
+
+- Stack Top is on the **left** (or define your convention clearly and use it consistently throughout the lecture).
+- `$` marks the end of both the stack and the input.
+
+---
+
+# Parsing Procedure
+
+At each step
+
+1. Observe the Stack Top.
+2. Observe the Current Input Symbol.
+3. Consult the Parsing Table.
+4. Perform one action.
+
+- Expand
+- Match
+- Accept
+- Error
+
+---
+
+# Parsing Trace (Beginning)
+
+| Step | Stack | Input | Action |
+|------|-------|-------|--------|
+| 1 | E $ | id + id * id $ | Apply `E → TE'` |
+| 2 | T E' $ | id + id * id $ | Apply `T → FT'` |
+| 3 | F T' E' $ | id + id * id $ | Apply `F → id` |
+| 4 | id T' E' $ | id + id * id $ | Match `id` |
+| 5 | T' E' $ | + id * id $ | Continue... |
+
+---
+
+# Think Like a Compiler 💡
+
+Notice something important.
+
+The parser never guesses.
+
+It never backtracks.
+
+Every decision comes directly from
+
+```text
+Parsing Table
+
++
+
+Current Input Symbol
+```
+
+This is why LL(1) parsing is called **Predictive Parsing**.
+
+---
+
+# Observation
+
+After matching the first
+
+```text
+id
+```
+
+the parser reaches
+
+```text
+T'
+```
+
+The next input symbol is
+
+```text
++
+```
+
+The parser now consults
+
+```text
+M[T', +]
+```
+
+From the parsing table,
+
+```text
+M[T', +]
+
+=
+
+T' → ε
+```
+
+So,
+
+`T'` is removed from the stack without consuming any input.
+
+This is the first place where the **FOLLOW** set is used indirectly through the parsing table.
+
+---
+
+---
+
+# Complete LL(1) Parsing Trace
+
+We will now parse the input string
+
+```text
+id + id * id $
+```
+
+using the LL(1) Parsing Table.
+
+**Notation**
+
+- Stack Top is shown on the **left**.
+- `$` is the bottom-of-stack marker and end-of-input marker.
+- The parser performs one action in each step.
+
+---
+
+# Parsing Trace
+
+| Step | Stack | Input | Action |
+|------|-------|-------|--------|
+| 1 | E $ | id + id * id $ | Apply `E → T E'` |
+| 2 | T E' $ | id + id * id $ | Apply `T → F T'` |
+| 3 | F T' E' $ | id + id * id $ | Apply `F → id` |
+| 4 | id T' E' $ | id + id * id $ | Match `id` |
+| 5 | T' E' $ | + id * id $ | Apply `T' → ε` |
+| 6 | E' $ | + id * id $ | Apply `E' → + T E'` |
+| 7 | + T E' $ | + id * id $ | Match `+` |
+| 8 | T E' $ | id * id $ | Apply `T → F T'` |
+| 9 | F T' E' $ | id * id $ | Apply `F → id` |
+| 10 | id T' E' $ | id * id $ | Match `id` |
+| 11 | T' E' $ | * id $ | Apply `T' → * F T'` |
+| 12 | * F T' E' $ | * id $ | Match `*` |
+| 13 | F T' E' $ | id $ | Apply `F → id` |
+| 14 | id T' E' $ | id $ | Match `id` |
+| 15 | T' E' $ | $ | Apply `T' → ε` |
+| 16 | E' $ | $ | Apply `E' → ε` |
+| 17 | $ | $ | **Accept** |
+
+---
+
+# Understanding the Trace
+
+Observe the sequence of actions.
+
+```
+Expand
+
+↓
+
+Expand
+
+↓
+
+Expand
+
+↓
+
+Match
+
+↓
+
+Expand
+
+↓
+
+Match
+
+↓
+
+Expand
+
+↓
+
+Match
+
+↓
+
+...
+
+↓
+
+Accept
+```
+
+Notice that
+
+- Expanding a Non-Terminal does **not** consume input.
+- Matching a terminal **does** consume input.
+- Applying `ε` removes the Non-Terminal from the stack without consuming input.
+
+---
+
+# Where Were FIRST and FOLLOW Used?
+
+Although they do not appear directly in the parsing trace, they are used through the parsing table.
+
+Examples
+
+| Table Lookup | Reason |
+|--------------|--------|
+| `M[E,id]` | `id ∈ FIRST(E)` |
+| `M[T,id]` | `id ∈ FIRST(T)` |
+| `M[F,id]` | `id ∈ FIRST(F)` |
+| `M[T',+]` | `+ ∈ FOLLOW(T')`, therefore use `T' → ε` |
+| `M[E',$]` | `$ ∈ FOLLOW(E')`, therefore use `E' → ε` |
+
+This shows that
+
+- **FIRST** helps choose productions that begin with terminals.
+- **FOLLOW** helps decide when an ε-production should be applied.
+
+---
+
+# Why Does the Parser Accept?
+
+At the end of parsing,
+
+Stack
+
+```text
+$
+```
+
+Input
+
+```text
+$
+```
+
+Both are identical.
+
+Therefore,
+
+the parser reports
+
+```text
+Accepted
+```
+
+This means the input string belongs to the language generated by the grammar.
+
+---
+
+# What Happens for an Invalid Input?
+
+Suppose the input is
+
+```text
+id + * id $
+```
+
+After matching
+
+```text
+id +
+```
+
+the parser expects
+
+```text
+T
+```
+
+A valid `T` must begin with
+
+```text
+id
+
+or
+
+(
+```
+
+Instead,
+
+the next input symbol is
+
+```text
+*
+```
+
+Looking up
+
+```text
+M[T,*]
+```
+
+gives
+
+```text
+Error
+```
+
+The parser immediately reports
+
+```text
+Syntax Error
+```
+
+No backtracking is performed.
+
+---
+
+# Think Like a Compiler 💡
+
+Imagine using Google Maps.
+
+At every intersection,
+
+you look only at
+
+- your current position, and
+- the next instruction.
+
+You do not recompute the entire route.
+
+Similarly,
+
+the LL(1) parser decides only the **next action** based on
+
+- Stack Top
+- Current Input Symbol
+
+This makes the parser efficient and deterministic.
+
+---
+
+# Comparison
+
+| Recursive Descent Parser | LL(1) Predictive Parser |
+|---------------------------|-------------------------|
+| May backtrack | Never backtracks |
+| Uses recursive functions | Uses stack and parsing table |
+| Slower for ambiguous choices | Faster due to direct table lookup |
+| Harder to implement for complex grammars | Easier once the parsing table is available |
+
+---
+
+# Common Student Mistakes
+
+❌ Consuming an input symbol after applying a production.
+
+Wrong.
+
+Input advances **only after a successful terminal match**.
+
+---
+
+❌ Pushing production symbols from left to right.
+
+Wrong.
+
+Symbols are pushed **from right to left**, ensuring the leftmost symbol is processed first.
+
+---
+
+❌ Assuming ε is read from the input.
+
+Wrong.
+
+ε is never present in the input.
+
+It simply removes the Non-Terminal from the stack.
+
+---
+
+# Viva Questions
+
+1. What are the four actions of an LL(1) parser?
+2. When is a production expanded?
+3. When is an input symbol consumed?
+4. What indicates successful parsing?
+5. How are FIRST and FOLLOW used during parsing?
+
+---
+
+# Module 2 Summary
+
+In this module, we studied:
+
+- Introduction to Syntax Analysis
+- Top-Down Parsing
+- Left Recursion
+- Left Factoring
+- Recursive Descent Parsing
+- Backtracking
+- Predictive Parsing
+- FIRST Set
+- FOLLOW Set
+- LL(1) Parsing Table
+- LL(1) Parsing Algorithm
+- Complete Parsing Example
+
+---
+
+# Bridge to Module 3
+
+So far,
+
+the parser started from the **Start Symbol** and expanded productions until it reached the input string.
+
+This approach is called
+
+```text
+Top-Down Parsing
+```
+
+In the next module,
+
+we will study the opposite approach.
+
+Instead of starting from the grammar,
+
+we start from the **input string** and gradually reduce it to the Start Symbol.
+
+This approach is called
+
+```text
+Bottom-Up Parsing
+```
+
+It forms the basis of powerful parser generators such as **SLR**, **CLR**, and **LALR**, which are widely used in modern compiler construction.
+
+---
+
+# End of Module 2
+
+## Key Takeaways
+
+- FIRST determines which production can begin with a given terminal.
+- FOLLOW determines when an ε-production should be selected.
+- The LL(1) Parsing Table combines FIRST and FOLLOW into a deterministic decision mechanism.
+- The LL(1) parser uses a stack, an input buffer, and the parsing table to parse strings without backtracking.
+- Understanding LL(1) parsing provides the foundation for studying Bottom-Up parsing in the next module.
