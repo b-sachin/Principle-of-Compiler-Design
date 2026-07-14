@@ -249,11 +249,9 @@ LEX simply converts those specifications into a working scanner.
 
 # Classroom Discussion
 
-Ask students:
-
 > **Can LEX recognize a programming language without any token definitions?**
 
-Expected answer:
+answer:
 
 **No.**
 
