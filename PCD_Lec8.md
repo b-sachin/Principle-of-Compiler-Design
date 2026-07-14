@@ -249,11 +249,9 @@ LEX simply converts those specifications into a working scanner.
 
 # Classroom Discussion
 
-Ask students:
-
 > **Can LEX recognize a programming language without any token definitions?**
 
-Expected answer:
+answer:
 
 **No.**
 
@@ -727,36 +725,6 @@ Let us now see where LEX fits in the compiler.
 ## Figure 8.5 : LEX in the Compiler Pipeline
 
 ![Figure 8.5 - LEX in Compiler](images/lec08_fig05_lex_pipeline.png)
-
----
-
-### Graphviz (Dreampuf) Code
-
-```dot
-digraph CompilerPipeline {
-
-    rankdir=LR;
-    bgcolor="white";
-
-    node [shape=box, style=rounded];
-
-    RE[label="Regular\nExpressions"];
-    LEX[label="LEX"];
-    Scanner[label="Lexical\nAnalyzer"];
-    Parser[label="Syntax\nAnalyzer"];
-
-    RE -> LEX;
-    LEX -> Scanner;
-    Scanner -> Parser;
-
-}
-```
-
-Save the image as
-
-```text
-images/lec08_fig05_lex_pipeline.png
-```
 
 ---
 
